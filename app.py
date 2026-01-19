@@ -68,3 +68,47 @@ def list_reservations():
 
 if __name__ == "__main__":
     app.run()
+    @app.route("/admin")
+def admin():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("SELECT id, departure, arrival, date FROM reservations")
+    rows = c.fetchall()
+    conn.close()
+
+    html = "<h1>管理画面（予約一覧）</h1><ul>"
+    for r in rows:
+        html += f"""
+        <li>
+            {r[1]} → {r[2]}（{r[3]}）
+            <a href="/delete/{r[0]}">削除</a>
+        </li>
+        """
+    html += "</ul><a href='/'>トップへ</a>"
+    @app.route("/admin")
+def admin():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("SELECT id, departure, arrival, date FROM reservations")
+    rows = c.fetchall()
+    conn.close()
+
+    html = "<h1>管理画面（予約一覧）</h1><ul>"
+    for r in rows:
+        html += f"""
+        <li>
+            {r[1]} → {r[2]}（{r[3]}）
+            <a href="/delete/{r[0]}">削除</a>
+        </li>
+        """
+    html += "</ul><a href='/'>トップへ</a>"
+    return html
+    @app.route("/delete/<int:reservation_id>")
+def delete(reservation_id):
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("DELETE FROM reservations WHERE id = ?", (reservation_id,))
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for("admin"))
